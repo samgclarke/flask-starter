@@ -15,7 +15,7 @@ db = SQLAlchemy(app)
 mail = Mail(app)
 
 
-# import into scriptspeaker namespace
-import flask_starter.views
-import flask_starter.models
-import flask_starter.logs
+# import into flaskstarter namespace
+import flaskstarter.views
+import flaskstarter.models
+import flaskstarter.logs

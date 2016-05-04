@@ -1,10 +1,10 @@
-from flask_starter import app, db
-from flask_starter.logs import logger, syslog, loglevel
+from flaskstarter import app, db
 import datetime
 from passlib.apps import custom_app_context as pwd_context
 
 
 class User(db.Model):
+    """User model."""
 
     __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
@@ -13,7 +13,7 @@ class User(db.Model):
     email = db.Column(db.String(50), unique=True, index=True)
     registered_on = db.Column(db.DateTime, default=datetime.datetime.utcnow())
     confirmed = db.Column(db.Boolean, nullable=False, default=False)
-    
+
 
     def hash_password(self, password):
         self.password_hash = pwd_context.encrypt(password)

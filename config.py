@@ -27,7 +27,7 @@ class Config(object):
     MAIL_PASSWORD = os.environ['APP_MAIL_PASSWORD']
 
     #  mail accounts
-    MAIL_DEFAULT_SENDER = 'flask_starter.promo@gmail.com'
+    MAIL_DEFAULT_SENDER = 'cronneloctopus@gmail.com'
 
     #  flask user
     USER_ENABLE_CONFIRM_EMAIL = True
@@ -40,6 +40,9 @@ class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
     ROOT_URL = 'http://127.0.0.1:5000'
+    DATABASE = 'tests.db'
+    DATABASE_PATH = os.path.join(basedir, DATABASE)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
 
 
 class ProductionConfig(Config):
