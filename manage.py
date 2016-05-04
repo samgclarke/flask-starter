@@ -1,18 +1,16 @@
-from flask.ext.script import Manager
-from flask.ext.migrate import Migrate, MigrateCommand
+"""Run Develoipment Server."""
 
-from flask_starter import app, db
-
-migrate = Migrate(app, db)
-manager = Manager(app)
-
-manager.add_command('db', MigrateCommand)
+import os
+import logging
+from flaskstarter import app
 
 
-#  Alchemy Dumps
-from flask.ext.alchemydumps import AlchemyDumps, AlchemyDumpsCommand
-alchemydumps = AlchemyDumps(app, db)
-manager.add_command('alchemydumps', AlchemyDumpsCommand)
+print('APP CONFIG --> {}'.format(os.environ['APP_SETTINGS']))
+print('APP DB_URL --> {}'.format(app.config['SQLALCHEMY_DATABASE_URI']))
 
-if __name__ == '__main__':
-    manager.run()
+if app.debug:
+    #  supress INFO level logs when debug
+    log = logging.getLogger('werkzeug')
+    log.setLevel(logging.ERROR)
+
+app.run(debug=True, threaded=True, port=5000, use_reloader=False)
