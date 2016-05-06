@@ -17,8 +17,10 @@
     <a href="{{ url_for('index') }}">Home</a>
     <a href="{{ url_for('auth.register') }}">Register</a>
     <a href="{{ url_for('auth.login') }}">Login</a>
+    {% if g.user.is_authenticated %}
     <a href="{{ url_for('auth.logout') }}">Logout</a>
-    <a href="{{ url_for('auth.reset_password') }}">Logout</a>
+    <a href="{{ url_for('auth.reset_password') }}">Reset Password</a>
+    {% endif %}
     <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
