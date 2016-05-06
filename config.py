@@ -54,3 +54,11 @@ class StagingConfig(Config):
     DEVELOPMENT = True
     DEBUG = False
     ROOT_URL = ''
+
+class TestingConfig(Config):
+    DEVELOPMENT = True
+    DEBUG = True
+    ROOT_URL = 'http://127.0.0.1:5000'
+    DATABASE = 'tests.db'
+    DATABASE_PATH = os.path.join(basedir, DATABASE)
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH

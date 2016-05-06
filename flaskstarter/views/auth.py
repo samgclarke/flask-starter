@@ -12,6 +12,8 @@ from flaskstarter.email import send_email
 from flaskstarter.logs import logger
 from flaskstarter.models import User
 from flaskstarter.token import confirm_token, generate_confirmation_token
+from flaskstarter.forms import LoginForm, RegistrationForm, ResetPasswordForm,\
+    ConfirmResetPasswordForm
 
 
 auth = Blueprint('auth', __name__)
@@ -30,14 +32,20 @@ def load_user(id):
     return User.query.get(int(id))
 
 
+@app.before_request
+def before_request():
+    g.user = current_user
+
+
 ##############
 #  Register  #
 ##############
 def send_confirm_email(user_email=None, username=None, confirm_url=None):
     """Send confirm email address."""
-    print('send email!!!!!!!!!!!!!')
     if app.debug:
-        logger.info('email not sent. You are in DEBUG mode!')
+        msg = 'email not sent. You are in DEBUG mode!'
+        print(msg)
+        logger.info(msg)
         return True
     root_url = app.config.get('ROOT_URL')
     with app.app_context():
@@ -65,56 +73,48 @@ def send_confirm_email(user_email=None, username=None, confirm_url=None):
 @auth.route('/register', methods=['GET', 'POST'])
 def register():
     """Register user."""
-    # because of the unbounce landing page
-    if g.user.is_authenticated():
-        return redirect(url_for('auth.login', code=302))
-    # GET request (no data)
-    if request.method == 'GET':
-        return render_template('register.html')
-    #  check if email exists
-    email = request.form['email'].strip()
-    email_exists = User.query.filter_by(email=email).all()
-    if email_exists:
-        flash('Email address already exists', 'warning')
-        return render_template('register.html')
-    pwd = request.form['password'].strip()
-    user = User(
-        username=request.form['username'].strip(),
-        email=email,
-        confirmed=False
-    )
-    user.hash_password(pwd)
-    try:
-        db.session.add(user)
-        db.session.commit()
-        #  generate token and send email
-        token = generate_confirmation_token(user.email)
-        confirm_url = url_for(
-            'auth.confirm_email',
-            token=token,
-            _external=True
-        )
-        send_confirm_email(
-            user_email=user.email,
-            confirm_url=confirm_url,
-            username=user.username
-        )
-        logger.info(
-            'new user registered. {}'.format(user)
-        )
-        flash(
-            'Thanks for registering with us. \
-            A confirmation email has been sent via email.', 'success'
-        )
-    except Exception as e:
-        # TODO deal with duplicate email addresses
-        db.session.rollback()
-        logger.error(
-            'new user could not be registered. {0}. {1}'.format(user, e)
-        )
-    finally:
-        db.session.close()
-    return redirect(url_for('auth.login'))
+    form = RegistrationForm(request.form, country='CL')
+    if request.method == 'POST' and form.validate():
+        email_exists = User.query.filter_by(email=form.email.data).first()
+        if email_exists:
+            flash(u'Email address already exists', 'warning')
+        else:
+            user = User(
+                username=form.username.data,
+                email=form.email.data,
+            )
+            user.hash_password(form.password.data)
+        try:
+            db.session.add(user)
+            db.session.commit()
+            #  generate token and send email
+            token = generate_confirmation_token(user.email)
+            confirm_url = url_for(
+                'auth.confirm_email',
+                token=token,
+                _external=True
+            )
+            send_confirm_email(
+                user_email=user.email,
+                confirm_url=confirm_url,
+                username=user.username
+            )
+            logger.info(
+                'new user registered. {}'.format(user)
+            )
+            flash(
+                'Thanks for registering with us. \
+                A confirmation email has been sent via email.', 'success'
+            )
+        except Exception as e:
+            # TODO deal with duplicate email addresses
+            db.session.rollback()
+            logger.error(
+                'new user could not be registered. {0}. {1}'.format(user, e)
+            )
+        finally:
+            db.session.close()
+        return redirect(url_for('auth.login'))
 
 
 @auth.route('/unconfirmed')
@@ -174,100 +174,117 @@ def confirm_email(token):
 @check_confirmed
 def reset_password():
     """Request password reset."""
-    if request.method == 'GET':
-        return render_template('reset_password_request.html')
-    #  check user email exists
-    email = request.form['email'].strip()
-    user = User.query.filter_by(email=email).first()
-    if user:
-        token = generate_confirmation_token(user.email)
-        confirm_url = url_for(
-            'auth.confirm_reset_password', token=token, _external=True
+    form = ResetPasswordForm(request.form)
+    if request.method == 'POST' and form.validate():
+        #  check user email exists
+        email = request.form['email'].strip()
+        user = User.query.filter_by(email=email).first()
+        if user:
+            token = generate_confirmation_token(user.email)
+            confirm_url = url_for(
+                'auth.confirm_reset_password',
+                token=token,
+                _external=True
+            )
+            html = render_template(
+                'user/password_reset_email.html',
+                confirm_url=confirm_url,
+                username=user.username
+            )
+            subject = "Password Reset Request"
+            send_email(email, subject, html)
+            msg = 'Password reset request email sent to {}'.format(user.email)
+            logger.info(msg)
+            flash(msg, 'success')
+            return redirect(url_for('auth.login'))
+        #  flash('Email address not found for any user', 'warning')
+        flash(
+            'Email address not found for any user',
+            'warning'
         )
-        html = render_template(
-            'user/password_reset_email.html', confirm_url=confirm_url
-        )
-        subject = "Password Reset Request"
-        send_email(email, subject, html)
-        msg = 'Password reset request email sent to {}'.format(user.email)
-        logger.info(msg)
-        flash(msg, 'success')
-        return redirect(url_for('auth.login'))
-    #  flash('Email address not found for any user', 'warning')
-    flash('Email address not found for any user', 'warning')
-    return render_template('reset_password_request.html')
+    return render_template(
+        'reset_password_request.html',
+        form=form
+    )
 
 
 @auth.route('/confirm_reset_password/<token>', methods=['GET', 'POST'])
 @check_confirmed
 def confirm_reset_password(token):
     """Confirm password reset."""
-    if request.method == 'GET':
-        return render_template(
-            'reset_password_confirm.html',
-            token=token,
-        )
-    try:
-        email = confirm_token(token)
-    except Exception as e:
-        flash('The confirmation link is invalid or has expired.', 'warning')
-    user = User.query.filter_by(email=email).first_or_404()
-    if not user.confirmed:
-        flash('You must confirm your account first', 'warning')
-    else:
-        pwd = request.form['password'].strip()
-        user.hash_password(pwd)
+    form = ConfirmResetPasswordForm(request.form)
+    if request.method == 'POST' and form.validate():
         try:
-            db.session.add(user)
-            db.session.commit()
-            logger.info(
-                'Password reset. {}'.format(user)
-            )
+            email = confirm_token(token)
         except Exception as e:
-            db.session.rollback()
-            error_msg = 'Your password could not be changed at this time. \
-                {}'.format(user)
-            logger.error('{0} {1}'.format(error_msg, e))
-            flash(error_msg, 'warning')
-            raise
-        finally:
-            db.session.close()
-        flash('You have successfully changed your password.', 'success')
-    return redirect(url_for('auth.login'))
+            flash(
+                'The confirmation link is invalid or has expired.',
+                'warning'
+            )
+        user = User.query.filter_by(email=email).first_or_404()
+        if not user.confirmed:
+            flash(
+                'You must confirm your account first',
+                'warning'
+            )
+        else:
+            pwd = request.form['password'].strip()
+            user.hash_password(pwd)
+            try:
+                db.session.add(user)
+                db.session.commit()
+                logger.info(
+                    'Password reset. {}'.format(user)
+                )
+            except Exception as e:
+                db.session.rollback()
+                error_msg = 'Your password could not be changed at this time. \
+                    {}'.format(user)
+                logger.error('{0} {1}'.format(error_msg, e))
+                flash(error_msg, 'warning')
+                raise
+            finally:
+                db.session.close()
+            flash('You have successfully changed your password.', 'success')
+            return redirect(url_for('auth.login'))
+    return render_template(
+        'reset_password_confirm.html',
+        token=token,
+        form=form
+    )
 
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
     """User login."""
+    form = LoginForm(request.form)
     # is user authenticated go straight to default template
-    if g.user.is_authenticated():
+    if g.user.is_authenticated:
         return redirect(url_for('index'), code=302)
-    if request.method == 'GET':
-        return render_template('login.html')
-    email = request.form['email']
-    password = request.form['password']
-    remember_me = False
-    if 'remember_me' in request.form:
-        remember_me = True
-    registered_user = User.query.filter_by(
-        email=email
-    ).first()
-    if registered_user is None or not registered_user.verify_password(password):
-        msg = 'Email or Password is invalid'
+    if request.method == 'POST' and form.validate():
+        email = request.form['email']
+        password = request.form['password']
+        registered_user = User.query.filter_by(
+            email=email
+        ).first()
+        if registered_user is None or not registered_user.verify_password(password):
+            msg = 'Email or Password is invalid'
+            logger.info(
+                '{0} email: {1}'.format(msg, email)
+            )
+            flash(msg, 'warning')
+            return redirect(url_for('auth.login'))
+        if not registered_user.confirmed:
+            logger.info(
+                'unconfirmed user login attempt. email: {0}'.format(email)
+            )
+            return redirect(url_for('auth.unconfirmed'))
+        login_user(registered_user)
         logger.info(
-            '{0} email: {1}'.format(msg, email)
+            'user login.  user: {0}'.format(current_user)
         )
-        flash(msg, 'warning')
-        return redirect(url_for('auth.login'))
-    if not registered_user.confirmed:
-        logger.info(
-            'unconfirmed user login attempt. email: {0}'.format(email)
-        )
-        return redirect(url_for('auth.unconfirmed'))
-    login_user(registered_user, remember=remember_me)
-    logger.info('user login.  user: {0}'.format(current_user))
-
-    return redirect(url_for('index'), code=302)
+        return redirect(url_for('index'), code=302)
+    return render_template('login.html')
 
 
 @auth.route('/logout')
