@@ -1,4 +1,4 @@
-from scriptspeaker import app
+from flaskstarter import app
 
 if __name__ == "__main__":
     app.run()
