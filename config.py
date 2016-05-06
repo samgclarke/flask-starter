@@ -37,10 +37,10 @@ class Config(object):
 
 
 class DevelopmentConfig(Config):
-    DEVELOPMENT = True
     DEBUG = True
+    TESTING = False
     ROOT_URL = 'http://127.0.0.1:5000'
-    DATABASE = 'tests.db'
+    DATABASE = '__database.db'
     DATABASE_PATH = os.path.join(basedir, DATABASE)
     SQLALCHEMY_DATABASE_URI = 'sqlite:///' + DATABASE_PATH
 
@@ -51,13 +51,13 @@ class ProductionConfig(Config):
 
 
 class StagingConfig(Config):
-    DEVELOPMENT = True
     DEBUG = False
     ROOT_URL = ''
 
+
 class TestingConfig(Config):
-    DEVELOPMENT = True
     DEBUG = True
+    TESTING = True
     ROOT_URL = 'http://127.0.0.1:5000'
     DATABASE = 'tests.db'
     DATABASE_PATH = os.path.join(basedir, DATABASE)

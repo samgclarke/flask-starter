@@ -1,0 +1,10 @@
+.message-card {
+	color: white;
+	padding: 10px;
+}
+.success {
+	background: green;
+}
+.warning {
+	background: red;
+}

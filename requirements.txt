@@ -1,6 +1,8 @@
 alembic==0.8.4
 blinker==1.4
 decorator==4.0.6
+ecdsa==0.13
+Fabric==1.11.1
 Flask==0.10.1
 Flask-AlchemyDumps==0.0.10
 Flask-Login==0.3.2
@@ -14,8 +16,10 @@ itsdangerous==0.24
 Jinja2==2.8
 Mako==1.0.3
 MarkupSafe==0.23
+paramiko==1.17.0
 passlib==1.6.5
 pbr==1.8.1
+pycrypto==2.6.1
 python-editor==0.5
 six==1.10.0
 SQLAlchemy==1.0.11

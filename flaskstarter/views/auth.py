@@ -42,8 +42,8 @@ def before_request():
 ##############
 def send_confirm_email(user_email=None, username=None, confirm_url=None):
     """Send confirm email address."""
-    if app.debug:
-        msg = 'email not sent. You are in DEBUG mode!'
+    if app.config['TESTING']:
+        msg = 'Email not sent. You are in TESTING mode!'
         print(msg)
         logger.info(msg)
         return True
@@ -115,6 +115,10 @@ def register():
         finally:
             db.session.close()
         return redirect(url_for('auth.login'))
+    return render_template(
+        'register.html',
+        form=form,
+    )
 
 
 @auth.route('/unconfirmed')
@@ -284,7 +288,10 @@ def login():
             'user login.  user: {0}'.format(current_user)
         )
         return redirect(url_for('index'), code=302)
-    return render_template('login.html')
+    return render_template(
+        'login.html',
+        form=form
+    )
 
 
 @auth.route('/logout')
