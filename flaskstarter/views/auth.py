@@ -4,8 +4,9 @@ from flask import Blueprint, flash, g, redirect, render_template, request, \
     url_for
 from flask.ext.login import LoginManager, current_user, login_required,  \
     login_user, logout_user
+from flask.ext.babel import lazy_gettext
 
-# namespace .uefa
+# namespace .flaskstarter
 from flaskstarter import app, db
 from flaskstarter.decorators import check_confirmed
 from flaskstarter.email import send_email
@@ -37,9 +38,6 @@ def before_request():
     g.user = current_user
 
 
-##############
-#  Register  #
-##############
 def send_confirm_email(user_email=None, username=None, confirm_url=None):
     """Send confirm email address."""
     if app.config['TESTING']:
@@ -55,7 +53,7 @@ def send_confirm_email(user_email=None, username=None, confirm_url=None):
             username=username,
             root_url=root_url
         )
-        subject = 'Please confirm your email'
+        subject = lazy_gettext(u'Please confirm your email')
         try:
             send_email(user_email, subject, html)
             logger.info(
@@ -70,7 +68,13 @@ def send_confirm_email(user_email=None, username=None, confirm_url=None):
             return False
 
 
-@auth.route('/register', methods=['GET', 'POST'])
+############
+#  Routes  #
+############
+@auth.route('/en/register/', endpoint="register_en",
+            methods=['GET', 'POST'])
+@auth.route('/es/register/', endpoint="register_es",
+            methods=['GET', 'POST'])
 def register():
     """Register user."""
     form = RegistrationForm(request.form, country='CL')
@@ -90,7 +94,7 @@ def register():
             #  generate token and send email
             token = generate_confirmation_token(user.email)
             confirm_url = url_for(
-                'auth.confirm_email',
+                'auth.confirm_email_' + g.language,
                 token=token,
                 _external=True
             )
@@ -114,23 +118,25 @@ def register():
             )
         finally:
             db.session.close()
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login_' + g.language))
     return render_template(
         'register.html',
         form=form,
     )
 
 
-@auth.route('/unconfirmed')
+@auth.route('/en/unconfirmed/', endpoint="unconfirmed_en")
+@auth.route('/es/unconfirmed/', endpoint="unconfirmed_es")
 def unconfirmed():
     """Return unconfirmed template."""
     if hasattr(current_user, 'confirmed') and current_user.confirmed:
-        return redirect(url_for('auth.login'))
+        return redirect(url_for('auth.login_' + g.language))
     flash('Please confirm your account!', 'warning')
     return render_template('unconfirmed.html')
 
 
-@auth.route('/confirm/<token>')
+@auth.route('/en/confirm/<token>/', endpoint="confirm_en")
+@auth.route('/es/confirm/<token>/', endpoint="confirm_es")
 def confirm_email(token):
     """Confirm token with email address using token."""
     user = None
@@ -140,7 +146,8 @@ def confirm_email(token):
             user = User.query.filter_by(email=email).first()
         except Exception as e:
             flash(
-                'Sorry, we could not find your account in our database.', 'warning'
+                'Sorry, we could not find your account in our database.',
+                'warning'
             )
             logger.error('error {}. email {}'.format(e, email))
         if not user:
@@ -148,7 +155,7 @@ def confirm_email(token):
                 'user could not be confirmed. email {}'.format(email)
             )
             flash('We could not verify your email address.', 'warning')
-            return redirect(url_for('auth.register'))
+            return redirect(url_for('auth.register_' + g.language))
         if user.confirmed:
             flash('Account already confirmed. Please login.', 'success')
         else:
@@ -171,10 +178,13 @@ def confirm_email(token):
             flash('You have confirmed your account. Thanks!', 'success')
     else:
         flash('The confirmation link is invalid or has expired.', 'warning')
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('auth.login_' + g.language))
 
 
-@auth.route('/reset_password', methods=['GET', 'POST'])
+@auth.route('/en/reset_password/',
+            endpoint="reset_password_en", methods=['GET', 'POST'])
+@auth.route('/es/reset_password/',
+            endpoint="reset_password_es", methods=['GET', 'POST'])
 @check_confirmed
 def reset_password():
     """Request password reset."""
@@ -186,7 +196,7 @@ def reset_password():
         if user:
             token = generate_confirmation_token(user.email)
             confirm_url = url_for(
-                'auth.confirm_reset_password',
+                'auth.confirm_reset_password_' + g.language,
                 token=token,
                 _external=True
             )
@@ -200,7 +210,7 @@ def reset_password():
             msg = 'Password reset request email sent to {}'.format(user.email)
             logger.info(msg)
             flash(msg, 'success')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login_' + g.language))
         #  flash('Email address not found for any user', 'warning')
         flash(
             'Email address not found for any user',
@@ -212,7 +222,10 @@ def reset_password():
     )
 
 
-@auth.route('/confirm_reset_password/<token>', methods=['GET', 'POST'])
+@auth.route('/en/confirm_reset_password/<token>/',
+            endpoint="confirm_reset_password_en", methods=['GET', 'POST'])
+@auth.route('/es/confirm_reset_password/<token>/',
+            endpoint="confirm_reset_password_es", methods=['GET', 'POST'])
 @check_confirmed
 def confirm_reset_password(token):
     """Confirm password reset."""
@@ -250,7 +263,7 @@ def confirm_reset_password(token):
             finally:
                 db.session.close()
             flash('You have successfully changed your password.', 'success')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login_' + g.language))
     return render_template(
         'reset_password_confirm.html',
         token=token,
@@ -258,13 +271,16 @@ def confirm_reset_password(token):
     )
 
 
-@auth.route('/login', methods=['GET', 'POST'])
+@auth.route('/en/login/', endpoint="login_en",
+            methods=['GET', 'POST'])
+@auth.route('/es/login/', endpoint="login_es",
+            methods=['GET', 'POST'])
 def login():
     """User login."""
     form = LoginForm(request.form)
     # is user authenticated go straight to default template
     if g.user.is_authenticated:
-        return redirect(url_for('index'), code=302)
+        return redirect(url_for('index_' + g.language), code=302)
     if request.method == 'POST' and form.validate():
         email = request.form['email']
         password = request.form['password']
@@ -277,17 +293,17 @@ def login():
                 '{0} email: {1}'.format(msg, email)
             )
             flash(msg, 'warning')
-            return redirect(url_for('auth.login'))
+            return redirect(url_for('auth.login_' + g.language))
         if not registered_user.confirmed:
             logger.info(
                 'unconfirmed user login attempt. email: {0}'.format(email)
             )
-            return redirect(url_for('auth.unconfirmed'))
+            return redirect(url_for('auth.unconfirmed_' + g.language))
         login_user(registered_user)
         logger.info(
             'user login.  user: {0}'.format(current_user)
         )
-        return redirect(url_for('index'), code=302)
+        return redirect(url_for('index_' + g.language), code=302)
     return render_template(
         'login.html',
         form=form
@@ -302,4 +318,4 @@ def logout():
         'user logout. user: {0}'.format(current_user)
     )
     logout_user()
-    return redirect(url_for('auth.login'))
+    return redirect(url_for('auth.login_' + g.language))

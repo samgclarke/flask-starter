@@ -14,3 +14,7 @@ nav, main {
 .warning {
   background: red;
 }
+
+.lang-button {
+  float:right;	
+}

@@ -35,6 +35,12 @@ class Config(object):
     #  remote logging
     LOGGING_URL = os.environ['LOGGING_URL']
 
+    #  languages
+    LANGUAGES = {
+        'en': 'English',
+        'es': 'Espanol'
+    }
+
 
 class DevelopmentConfig(Config):
     DEBUG = True
