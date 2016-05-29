@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-05-06 18:13-0700\n"
+"POT-Creation-Date: 2016-05-29 10:59-0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,9 +19,55 @@ msgstr ""
 
 #: templates/index.html:4
 msgid "Hello world! This is Flask Starter!"
-msgstr "¡Hola Mundo! Este es el Flask Starter!"
+msgstr ""
 
 #: views/auth.py:56
-msgid "Please confirm your email"
-msgstr "Por favor, confirma tu email"
+msgid "Please confirm your email."
+msgstr ""
+
+#: views/auth.py:84
+msgid "Email address already exists."
+msgstr ""
+
+#: views/auth.py:110
+msgid ""
+"Thanks for registering with us.                 A confirmation email has "
+"been sent via email."
+msgstr ""
+
+#: views/auth.py:134
+msgid "Please confirm your account!"
+msgstr ""
+
+#: views/auth.py:149
+msgid "Sorry, we could not find your account in our database."
+msgstr ""
+
+#: views/auth.py:157
+msgid "We could not verify your email address."
+msgstr ""
+
+#: views/auth.py:160
+msgid "Account already confirmed. Please login."
+msgstr ""
+
+#: views/auth.py:178
+msgid "You have confirmed your account. Thanks!"
+msgstr ""
+
+#: views/auth.py:181 views/auth.py:241
+msgid "The confirmation link is invalid or has expired."
+msgstr ""
+
+#: views/auth.py:219
+msgid "Email address not found for any user."
+msgstr ""
+
+#: views/auth.py:247
+msgid "You must confirm your account first."
+msgstr ""
+
+#: views/auth.py:269
+msgid "You have successfully changed your password."
+msgstr ""
 

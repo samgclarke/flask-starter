@@ -4,7 +4,7 @@ from flask import Blueprint, flash, g, redirect, render_template, request, \
     url_for
 from flask.ext.login import LoginManager, current_user, login_required,  \
     login_user, logout_user
-from flask.ext.babel import lazy_gettext
+from flask.ext.babel import lazy_gettext as _
 
 # namespace .flaskstarter
 from flaskstarter import app, db
@@ -53,7 +53,7 @@ def send_confirm_email(user_email=None, username=None, confirm_url=None):
             username=username,
             root_url=root_url
         )
-        subject = lazy_gettext(u'Please confirm your email')
+        subject = _(u'Please confirm your email.')
         try:
             send_email(user_email, subject, html)
             logger.info(
@@ -81,7 +81,7 @@ def register():
     if request.method == 'POST' and form.validate():
         email_exists = User.query.filter_by(email=form.email.data).first()
         if email_exists:
-            flash(u'Email address already exists', 'warning')
+            flash(_(u'Email address already exists.', 'warning'))
         else:
             user = User(
                 username=form.username.data,
@@ -107,8 +107,8 @@ def register():
                 'new user registered. {}'.format(user)
             )
             flash(
-                'Thanks for registering with us. \
-                A confirmation email has been sent via email.', 'success'
+                _(u'Thanks for registering with us. \
+                A confirmation email has been sent via email.'), 'success'
             )
         except Exception as e:
             # TODO deal with duplicate email addresses
@@ -131,7 +131,7 @@ def unconfirmed():
     """Return unconfirmed template."""
     if hasattr(current_user, 'confirmed') and current_user.confirmed:
         return redirect(url_for('auth.login_' + g.language))
-    flash('Please confirm your account!', 'warning')
+    flash(_(u'Please confirm your account!'), 'warning')
     return render_template('unconfirmed.html')
 
 
@@ -146,7 +146,7 @@ def confirm_email(token):
             user = User.query.filter_by(email=email).first()
         except Exception as e:
             flash(
-                'Sorry, we could not find your account in our database.',
+                _(u'Sorry, we could not find your account in our database.'),
                 'warning'
             )
             logger.error('error {}. email {}'.format(e, email))
@@ -154,10 +154,10 @@ def confirm_email(token):
             logger.error(
                 'user could not be confirmed. email {}'.format(email)
             )
-            flash('We could not verify your email address.', 'warning')
+            flash(_(u'We could not verify your email address.'), 'warning')
             return redirect(url_for('auth.register_' + g.language))
         if user.confirmed:
-            flash('Account already confirmed. Please login.', 'success')
+            flash(_(u'Account already confirmed. Please login.'), 'success')
         else:
             user.confirmed = True
             user.confirmed_on = datetime.datetime.now()
@@ -175,9 +175,12 @@ def confirm_email(token):
                 raise
             finally:
                 db.session.close()
-            flash('You have confirmed your account. Thanks!', 'success')
+            flash(_(u'You have confirmed your account. Thanks!'), 'success')
     else:
-        flash('The confirmation link is invalid or has expired.', 'warning')
+        flash(
+            _(u'The confirmation link is invalid or has expired.'),
+            'warning'
+        )
     return redirect(url_for('auth.login_' + g.language))
 
 
@@ -205,15 +208,15 @@ def reset_password():
                 confirm_url=confirm_url,
                 username=user.username
             )
-            subject = "Password Reset Request"
+            subject = -(u'Password Reset Request')
             send_email(email, subject, html)
-            msg = 'Password reset request email sent to {}'.format(user.email)
-            logger.info(msg)
+            msg = u'Password reset request email sent to {}'.format(user.email)
+            logger.info(_(msg))
             flash(msg, 'success')
             return redirect(url_for('auth.login_' + g.language))
         #  flash('Email address not found for any user', 'warning')
         flash(
-            'Email address not found for any user',
+            _(u'Email address not found for any user.'),
             'warning'
         )
     return render_template(
@@ -235,13 +238,13 @@ def confirm_reset_password(token):
             email = confirm_token(token)
         except Exception as e:
             flash(
-                'The confirmation link is invalid or has expired.',
+                _(u'The confirmation link is invalid or has expired.'),
                 'warning'
             )
         user = User.query.filter_by(email=email).first_or_404()
         if not user.confirmed:
             flash(
-                'You must confirm your account first',
+                _(u'You must confirm your account first.'),
                 'warning'
             )
         else:
@@ -255,14 +258,17 @@ def confirm_reset_password(token):
                 )
             except Exception as e:
                 db.session.rollback()
-                error_msg = 'Your password could not be changed at this time. \
+                error_msg = u'Your password could not be changed at this time. \
                     {}'.format(user)
                 logger.error('{0} {1}'.format(error_msg, e))
-                flash(error_msg, 'warning')
+                flash(_(error_msg), 'warning')
                 raise
             finally:
                 db.session.close()
-            flash('You have successfully changed your password.', 'success')
+            flash(
+                _(u'You have successfully changed your password.'),
+                'success'
+            )
             return redirect(url_for('auth.login_' + g.language))
     return render_template(
         'reset_password_confirm.html',
@@ -288,11 +294,11 @@ def login():
             email=email
         ).first()
         if registered_user is None or not registered_user.verify_password(password):
-            msg = 'Email or Password is invalid'
+            msg = u'Email or Password is invalid'
             logger.info(
                 '{0} email: {1}'.format(msg, email)
             )
-            flash(msg, 'warning')
+            flash(_(msg), 'warning')
             return redirect(url_for('auth.login_' + g.language))
         if not registered_user.confirmed:
             logger.info(

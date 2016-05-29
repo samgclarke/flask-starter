@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-05-06 18:13-0700\n"
+"POT-Creation-Date: 2016-05-29 10:59-0700\n"
 "PO-Revision-Date: 2016-05-06 18:15-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: es\n"
@@ -23,6 +23,54 @@ msgid "Hello world! This is Flask Starter!"
 msgstr "¡Hola Mundo! Este es el Flask Starter!"
 
 #: views/auth.py:56
-msgid "Please confirm your email"
-msgstr "Por favor, confirma tu email"
+msgid "Please confirm your email."
+msgstr "Por favor, confirma tu email."
+
+#: views/auth.py:84
+msgid "Email address already exists."
+msgstr "La dirección de correo ya existe."
+
+#: views/auth.py:110
+msgid ""
+"Thanks for registering with us.                 A confirmation email has "
+"been sent via email."
+msgstr ""
+"Gracias por registrarse con nosotros. Un correo electrónico de "
+"confirmación ha sidoenviado por correo electrónico."
+
+#: views/auth.py:134
+msgid "Please confirm your account!"
+msgstr "Por favor confirmar su cuenta!"
+
+#: views/auth.py:149
+msgid "Sorry, we could not find your account in our database."
+msgstr "Lo sentimos, no hemos podido encontrar su cuenta en nuestra base de datos."
+
+#: views/auth.py:157
+msgid "We could not verify your email address."
+msgstr "No hemos podido verificar su dirección de correo electrónico."
+
+#: views/auth.py:160
+msgid "Account already confirmed. Please login."
+msgstr "La cuenta ya confirmada. Por favor Iniciar sesión."
+
+#: views/auth.py:178
+msgid "You have confirmed your account. Thanks!"
+msgstr "Que haya confirmado su cuenta. ¡Gracias!"
+
+#: views/auth.py:181 views/auth.py:241
+msgid "The confirmation link is invalid or has expired."
+msgstr "El enlace de confirmación no es válido o ha caducado."
+
+#: views/auth.py:219
+msgid "Email address not found for any user."
+msgstr "Dirección de correo electrónico no encontrado para cualquier usuario."
+
+#: views/auth.py:247
+msgid "You must confirm your account first."
+msgstr "Debe confirmar su cuenta de primera."
+
+#: views/auth.py:269
+msgid "You have successfully changed your password."
+msgstr "Ha cambiado correctamente la contraseña."
 
