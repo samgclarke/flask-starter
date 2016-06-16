@@ -1,7 +1,7 @@
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
-from . import app, db
+from flaskstarter import app, db
 
 migrate = Migrate(app, db)
 manager = Manager(app)
