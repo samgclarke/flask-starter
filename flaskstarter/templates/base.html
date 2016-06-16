@@ -23,12 +23,12 @@
     <!-- navigation -->
     <nav>
       <a href="{{ url_for('index_' + g.language) }}">Home</a>
-      <a href="{{ url_for('auth.register_' + g.language) }}">Register</a>
       {% if g.user.is_authenticated %}
       <a href="{{ url_for('auth.logout') }}">Logout</a>
       <a href="{{ url_for('auth.reset_password_' + g.language) }}">Change Password</a>
       {% else %}
       <a href="{{ url_for('auth.login_' + g.language) }}">Login</a>
+      <a href="{{ url_for('auth.register_' + g.language) }}">Register</a>
       {% endif %}
 
       {% if request.endpoint %}
