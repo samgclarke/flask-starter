@@ -1,7 +1,7 @@
 #  logging
 import logging
 import socket
-from flaskstarter import app
+from .. import app
 from logging.handlers import SysLogHandler
 
 

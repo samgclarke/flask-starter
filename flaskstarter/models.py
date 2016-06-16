@@ -1,4 +1,4 @@
-from flaskstarter import app, db
+from flaskstarter import db
 import datetime
 from passlib.apps import custom_app_context as pwd_context
 
