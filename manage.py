@@ -1,5 +1,7 @@
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
+from flask.ext.alchemydumps import AlchemyDumps, AlchemyDumpsCommand
+
 
 from flaskstarter import app, db
 
@@ -10,7 +12,6 @@ manager.add_command('db', MigrateCommand)
 
 
 #  Alchemy Dumps
-from flask.ext.alchemydumps import AlchemyDumps, AlchemyDumpsCommand
 alchemydumps = AlchemyDumps(app, db)
 manager.add_command('alchemydumps', AlchemyDumpsCommand)
 
