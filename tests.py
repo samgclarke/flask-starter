@@ -44,7 +44,7 @@ class BaseTestCase(TestCase):
 
     def login(self, c=None):
         """Login user."""
-        login_url = 'auth.login'
+        login_url = 'auth.login_en'
         data = {'email': 'sam@rivalschools.tv', 'password': 'foobar'}
         resp = c.post(
             url_for(login_url),
@@ -69,7 +69,7 @@ class AuthTestCase(BaseTestCase):
         """Test user can register."""
         with self.client as client:
             resp = client.post(
-                url_for('auth.register'),
+                url_for('auth.register_en'),
                 data={
                     'fullname': 'Joe Bar',
                     'username': 'joebaz',
@@ -79,11 +79,11 @@ class AuthTestCase(BaseTestCase):
                 }
             )
         assert '<p>You should be redirected automatically to target URL: '\
-               '<a href="/login">/login</a>.  If not click the link.' in resp.get_data()
+               '<a href="/en/login/">/en/login/</a>.  If not click the link.' in resp.get_data()
 
     def test_invalid_login(self):
         """Test that incorrect login returns to login page."""
-        login_url = 'auth.login'
+        login_url = 'auth.login_en'
         with self.client as client:
             resp = client.post(
                 url_for(login_url),
@@ -97,7 +97,7 @@ class AuthTestCase(BaseTestCase):
         with self.client as client:
             resp = self.login(c=client)
         self.assert_redirects(
-            resp, url_for('auth.unconfirmed')
+            resp, url_for('auth.unconfirmed_en')
         )
 
     def test_confirmed_login(self):
@@ -106,7 +106,7 @@ class AuthTestCase(BaseTestCase):
         with self.client as client:
             resp = self.login(c=client)
         self.assert_redirects(
-            resp, url_for('index')
+            resp, url_for('index_en')
         )
 
 if __name__ == '__main__':

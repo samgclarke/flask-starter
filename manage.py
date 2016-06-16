@@ -9,6 +9,14 @@ manager = Manager(app)
 manager.add_command('db', MigrateCommand)
 
 
+@manager.command
+def createdb(drop_first=False):
+    """Create the database."""
+    if drop_first:
+        db.drop_all()
+    db.create_all()
+
+
 #  Alchemy Dumps
 from flask.ext.alchemydumps import AlchemyDumps, AlchemyDumpsCommand
 alchemydumps = AlchemyDumps(app, db)

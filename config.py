@@ -4,6 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     DEBUG = False
+    TESTING = False
     SECRET_KEY = 'this-really-needs-to-be-changed'
     TESTING = False
     CSRF_ENABLED = True
@@ -44,7 +45,6 @@ class Config(object):
 
 class DevelopmentConfig(Config):
     DEBUG = True
-    TESTING = False
     ROOT_URL = 'http://127.0.0.1:5000'
     DATABASE = '__database.db'
     DATABASE_PATH = os.path.join(basedir, DATABASE)

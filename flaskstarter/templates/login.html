@@ -3,7 +3,7 @@
 {% block content %}
 {% from "_formhelpers.html" import render_field %}
 
-<form method=post action="{{ url_for('auth.login') }}">
+<form method=post action="{{ url_for('auth.login_' + g.language) }}">
   <dl>
     {{ render_field(form.email) }}
     {{ render_field(form.password) }}
@@ -11,6 +11,6 @@
   <p><input type=submit value=Login>
 </form>
 
-<a href="{{ url_for('auth.reset_password') }}">Forgot Password?</a>
+<a href="{{ url_for('auth.reset_password_' + g.language) }}">Forgot Password?</a>
 
 {% endblock %}

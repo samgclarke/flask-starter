@@ -33,11 +33,6 @@ def load_user(id):
     return User.query.get(int(id))
 
 
-@app.before_request
-def before_request():
-    g.user = current_user
-
-
 def send_confirm_email(user_email=None, username=None, confirm_url=None):
     """Send confirm email address."""
     if app.config['TESTING']:
@@ -61,6 +56,7 @@ def send_confirm_email(user_email=None, username=None, confirm_url=None):
             )
             return True
         except Exception as e:
+            print('Error {}'.format(e))
             logger.error(
                 'confirmation email could not be sent. User {0}. Error {1}'
                 .format(user_email, e)
@@ -81,7 +77,9 @@ def register():
     if request.method == 'POST' and form.validate():
         email_exists = User.query.filter_by(email=form.email.data).first()
         if email_exists:
-            flash(_(u'Email address already exists.', 'warning'))
+            flash(
+                _(u'Email address already exists.'), 'warning'
+            )
         else:
             user = User(
                 username=form.username.data,
@@ -94,7 +92,7 @@ def register():
             #  generate token and send email
             token = generate_confirmation_token(user.email)
             confirm_url = url_for(
-                'auth.confirm_email_' + g.language,
+                'auth.confirm_' + g.language,
                 token=token,
                 _external=True
             )
@@ -114,7 +112,7 @@ def register():
             # TODO deal with duplicate email addresses
             db.session.rollback()
             logger.error(
-                'new user could not be registered. {0}. {1}'.format(user, e)
+                'new user could not be registered. {0}. {1}'.format(g.user, e)
             )
         finally:
             db.session.close()
