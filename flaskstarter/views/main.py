@@ -2,7 +2,7 @@
 from flask import Blueprint, g, render_template, request
 from flask.ext.login import current_user
 from flask.ext.babel import lazy_gettext
-from flaskstarter import app, babel
+from .. import app, babel
 
 
 main = Blueprint('main', __name__)

@@ -1,9 +1,8 @@
 import os
 import unittest
-import json
 from flask.ext.sqlalchemy import SQLAlchemy
-from flaskstarter import app, db
-from flaskstarter.models import User
+from . import app, db
+from .models import User
 from flask import url_for
 from flask.ext.testing import TestCase
 

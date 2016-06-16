@@ -7,13 +7,13 @@ from flask.ext.login import LoginManager, current_user, login_required,  \
 from flask.ext.babel import lazy_gettext as _
 
 # namespace .flaskstarter
-from flaskstarter import app, db
-from flaskstarter.decorators import check_confirmed
-from flaskstarter.email import send_email
-from flaskstarter.logs import logger
-from flaskstarter.models import User
-from flaskstarter.token import confirm_token, generate_confirmation_token
-from flaskstarter.forms import LoginForm, RegistrationForm, ResetPasswordForm,\
+from .. import app, db
+from ..decorators import check_confirmed
+from ..email import send_email
+from ..logs import logger
+from ..models import User
+from ..token import confirm_token, generate_confirmation_token
+from ..forms import LoginForm, RegistrationForm, ResetPasswordForm,\
     ConfirmResetPasswordForm
 
 
