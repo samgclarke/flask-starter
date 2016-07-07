@@ -110,7 +110,7 @@ def register():
             # TODO deal with duplicate email addresses
             db.session.rollback()
             logger.error(
-                'new user could not be registered. {0}. {1}'.format(user, e)
+                'new user could not be registered. {0}'.format(e)
             )
         finally:
             db.session.close()
