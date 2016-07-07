@@ -79,6 +79,32 @@ class AuthTestCase(BaseTestCase):
         assert '<p>You should be redirected automatically to target URL: '\
                '<a href="/login">/login</a>.  If not click the link.' in resp.get_data()
 
+    def test_register_email_exists_error(self):
+        """Test user cannot register with same email."""
+        login_url = 'auth.login'
+        with self.client as client:
+            resp = client.post(
+                url_for('auth.register'),
+                data={
+                    'fullname': 'Joe Bar',
+                    'username': 'joebaz',
+                    'email': 'sam@rivalschools.tv',
+                    'password': 'foobar',
+                    'confirm': 'foobar',
+                }
+            )
+            resp = client.post(
+                url_for('auth.register'),
+                data={
+                    'fullname': 'Foo Bar',
+                    'username': 'joebaz',
+                    'email': 'sam@rivalschools.tv',
+                    'password': 'foobar',
+                    'confirm': 'foobar',
+                }
+            )
+        self.assert_redirects(resp, url_for(login_url))
+
     def test_invalid_login(self):
         """Test that incorrect login returns to login page."""
         login_url = 'auth.login'
