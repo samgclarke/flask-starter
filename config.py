@@ -27,7 +27,7 @@ class Config(object):
     MAIL_PASSWORD = os.environ['APP_MAIL_PASSWORD']
 
     #  mail accounts
-    MAIL_DEFAULT_SENDER = 'cronneloctopus@gmail.com'
+    MAIL_DEFAULT_SENDER = os.environ['MAIL_DEFAULT_SENDER']
 
     #  flask user
     USER_ENABLE_CONFIRM_EMAIL = True
