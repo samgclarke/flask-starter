@@ -1,4 +1,5 @@
-import os
+"""Unit Tests."""
+
 import unittest
 from flaskstarter import app, db
 from flaskstarter.models import User
@@ -7,6 +8,14 @@ from flask.ext.testing import TestCase
 
 # Note: can run individual tests:
 # nosetests -s flaskstarter.tests.tests:FountainTestCase
+
+TEST_USER = {
+    'fullname': 'Joe Bar',
+    'username': 'joebaz',
+    'email': 'foo@bar.com',
+    'password': 'foobar',
+    'confirm': 'foobar',
+}
 
 
 class BaseTestCase(TestCase):
@@ -29,11 +38,11 @@ class BaseTestCase(TestCase):
     def make_user(self, pwd=False, confirm=False):
         """Make a user object to test with."""
         user = User(
-            username=u'foo',
-            email=u'sam@rivalschools.tv',
+            username=TEST_USER['username'],
+            email=TEST_USER['email'],
         )
         if pwd:
-            user.password = user.hash_password('foobar')
+            user.password = user.hash_password(TEST_USER['password'])
         if confirm:
             user.confirmed = True
         db.session.add(user)
@@ -43,7 +52,10 @@ class BaseTestCase(TestCase):
     def login(self, c=None):
         """Login user."""
         login_url = 'auth.login'
-        data = {'email': 'sam@rivalschools.tv', 'password': 'foobar'}
+        data = {
+            'email': TEST_USER['email'],
+            'password': TEST_USER['password']
+        }
         resp = c.post(
             url_for(login_url),
             data=data
@@ -68,13 +80,7 @@ class AuthTestCase(BaseTestCase):
         with self.client as client:
             resp = client.post(
                 url_for('auth.register'),
-                data={
-                    'fullname': 'Joe Bar',
-                    'username': 'joebaz',
-                    'email': 'sam@rivalschools.tv',
-                    'password': 'foobar',
-                    'confirm': 'foobar',
-                }
+                data=TEST_USER
             )
         assert '<p>You should be redirected automatically to target URL: '\
                '<a href="/login">/login</a>.  If not click the link.' in resp.get_data()
@@ -82,25 +88,16 @@ class AuthTestCase(BaseTestCase):
     def test_register_email_exists_error(self):
         """Test user cannot register with same email."""
         login_url = 'auth.login'
+        self.make_user(pwd=True, confirm=True)
         with self.client as client:
             resp = client.post(
                 url_for('auth.register'),
                 data={
-                    'fullname': 'Joe Bar',
-                    'username': 'joebaz',
-                    'email': 'sam@rivalschools.tv',
-                    'password': 'foobar',
-                    'confirm': 'foobar',
-                }
-            )
-            resp = client.post(
-                url_for('auth.register'),
-                data={
-                    'fullname': 'Foo Bar',
-                    'username': 'joebaz',
-                    'email': 'sam@rivalschools.tv',
-                    'password': 'foobar',
-                    'confirm': 'foobar',
+                    'fullname': 'New User',
+                    'username': 'newuser',
+                    'email': TEST_USER['email'],
+                    'password': 'newpass',
+                    'confirm': 'newpass',
                 }
             )
         self.assert_redirects(resp, url_for(login_url))
@@ -111,7 +108,10 @@ class AuthTestCase(BaseTestCase):
         with self.client as client:
             resp = client.post(
                 url_for(login_url),
-                data={'email': 'sam@rivalschools.tv', 'password': 'wrongpass'}
+                data={
+                    'email': TEST_USER['email'],
+                    'password': 'wrongpass'
+                }
             )
         self.assert_redirects(resp, url_for(login_url))
 
