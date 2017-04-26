@@ -2,7 +2,6 @@ import os
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask_mail import Mail
-from flask.ext.babel import Babel
 from flask.json import JSONEncoder
 
 
@@ -38,7 +37,6 @@ app.config.from_object(os.environ['APP_SETTINGS'])
 app.json_encoder = CustomJSONEncoder
 db = SQLAlchemy(app)
 mail = Mail(app)
-babel = Babel(app)
 
 # import into module namespace
 import_modules()
