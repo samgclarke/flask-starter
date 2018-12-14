@@ -1,1 +1,1 @@
-from logger import logger, syslog, loglevel
+from ..logs.logger import logger, syslog, loglevel

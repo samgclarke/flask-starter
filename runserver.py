@@ -13,4 +13,10 @@ if app.debug:
     log = logging.getLogger('werkzeug')
     log.setLevel(logging.ERROR)
 
-app.run(debug=True, threaded=True, port=5000, use_reloader=False)
+app.run(
+    debug=True,
+    host='0.0.0.0',
+    port=5000,
+    threaded=True,
+    use_reloader=False
+)
